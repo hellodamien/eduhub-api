@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -21,13 +20,45 @@ enum Role {
   STUDENT
 }
 
+enum UserStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
 model User {
+  id          String     @id @default(cuid())
+  email       String     @unique
+  status      UserStatus @default(PENDING)
+  password    String
+  firstName   String
+  lastName    String
+  role        Role       @default(STUDENT)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  registerPin String?
+
+  managedCourses Course[] @relation("TeacherCourses")
+}
+
+model Course {
   id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  firstName String
-  lastName  String
-  role      Role     @default(STUDENT)
+  title     String
+  teacherId String?
+  teacher   User?    @relation(fields: [teacherId], references: [id], name: "TeacherCourses")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ressources Ressource[]
+}
+
+model Ressource {
+  id        String   @id @default(cuid())
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id])
+  title     String
+  filePath  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

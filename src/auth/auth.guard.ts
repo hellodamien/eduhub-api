@@ -3,12 +3,15 @@ import {
   ExecutionContext,
   Injectable,
   UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './decorators/public.decorator';
+import { ROLES_KEY } from './decorators/roles.decorator';
 import { PrismaService } from '../database/prisma.service';
+import { Role } from '../../generated/prisma';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -42,7 +45,13 @@ export class AuthGuard implements CanActivate {
 
       const user = await this.prismaService.user.findUnique({
         where: { id: payload.sub },
-        select: { id: true, email: true, firstName: true, lastName: true },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+        },
       });
 
       if (!user) {
@@ -50,7 +59,24 @@ export class AuthGuard implements CanActivate {
       }
 
       request['user'] = user;
-    } catch {
+
+      // Check roles if specified
+      const requiredRoles = this.reflector.getAllAndOverride<Role[]>(
+        ROLES_KEY,
+        [context.getHandler(), context.getClass()],
+      );
+
+      if (requiredRoles && requiredRoles.length > 0) {
+        if (!requiredRoles.includes(user.role)) {
+          throw new ForbiddenException(
+            'You do not have permission to access this resource',
+          );
+        }
+      }
+    } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw error;
+      }
       throw new UnauthorizedException();
     }
     return true;
