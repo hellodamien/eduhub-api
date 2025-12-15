@@ -18,8 +18,7 @@ import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { AddRessourceDto } from './dto/add-ressource.dto';
-import { Roles } from 'src/auth/decorators/roles.decorator';
-import { Role, User } from '../../generated/prisma';
+import { Role, User } from 'generated/prisma';
 import { PrismaService } from '../database/prisma.service';
 import { Public } from 'src/auth/decorators/public.decorator';
 

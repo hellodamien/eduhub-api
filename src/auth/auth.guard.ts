@@ -11,7 +11,7 @@ import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './decorators/public.decorator';
 import { ROLES_KEY } from './decorators/roles.decorator';
 import { PrismaService } from '../database/prisma.service';
-import { Role } from '../../generated/prisma';
+import { Role } from 'generated/prisma';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
