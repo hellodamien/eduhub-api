@@ -1,34 +1,73 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Eduhub API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+A modern educational platform API built with NestJS, featuring course management, AI-powered quiz generation, and user authentication.
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Eduhub API is a comprehensive backend solution for educational platforms. It provides:
+
+- **User Management**: Secure authentication and authorization with JWT
+- **Course Management**: Create, update, and manage educational courses with resources
+- **AI-Powered Quizzes**: Generate quizzes automatically using Mistral AI
+- **Role-Based Access**: Support for different user roles (Student, Teacher, Admin)
+- **File Uploads**: Handle course materials and resources
+
+## Technology Stack
+
+- **Framework**: NestJS
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: JWT tokens
+- **AI Integration**: Mistral AI
+- **Package Manager**: pnpm
+
+## Prerequisites
+
+- Node.js (v18 or higher)
+- pnpm (v8 or higher)
+- PostgreSQL database
+- Mistral AI API key
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+# Database Configuration
+DATABASE_URL="postgresql://username:password@localhost:5432/eduhub?schema=public"
+
+# JWT Configuration
+JWT_SECRET="your-secure-jwt-secret-key-here"
+
+# Mistral AI Configuration
+MISTRAL_API_KEY="your-mistral-api-key-here"
+```
+
+### Variable Descriptions
+
+- **DATABASE_URL**: PostgreSQL connection string for Prisma ORM
+  - Format: `postgresql://[user]:[password]@[host]:[port]/[database]?schema=public`
+  - Example: `postgresql://postgres:password@localhost:5432/eduhub?schema=public`
+
+- **JWT_SECRET**: Secret key used for signing and verifying JWT tokens
+  - Should be a long, random string
+  - Keep this secret and never commit it to version control
+  - Example: Generate with `openssl rand -base64 32`
+
+- **MISTRAL_API_KEY**: API key for Mistral AI service
+  - Required for AI-powered quiz generation
+  - Get your API key from [Mistral AI Console](https://console.mistral.ai/)
 
 ## Project setup
 
 ```bash
+# Install dependencies
 $ pnpm install
+
+# Setup database
+$ pnpm prisma migrate dev
+
+# Seed database with initial data
+$ pnpm run seed
 ```
 
 ## Compile and run the project
@@ -37,12 +76,37 @@ $ pnpm install
 # development
 $ pnpm run start
 
-# watch mode
+# watch mode (recommended for development)
 $ pnpm run start:dev
 
 # production mode
 $ pnpm run start:prod
 ```
+
+The API will be available at `http://localhost:3000`
+
+## API Documentation
+
+### Main Endpoints
+
+- **Authentication**: `/auth`
+  - POST `/auth/register` - Register a new user
+  - POST `/auth/sign-in` - Sign in and get JWT token
+
+- **Users**: `/users`
+  - GET `/users` - List all users (Admin only)
+  - GET `/users/:id` - Get user by ID
+
+- **Courses**: `/courses`
+  - GET `/courses` - List all courses
+  - POST `/courses` - Create a new course (Teacher/Admin)
+  - GET `/courses/:id` - Get course details
+  - PATCH `/courses/:id` - Update course (Teacher/Admin)
+  - DELETE `/courses/:id` - Delete course (Admin)
+  - POST `/courses/:id/ressources` - Add resource to course
+
+- **Quizzes**: `/quizzes`
+  - POST `/quizzes/generate` - Generate AI-powered quiz from course content
 
 ## Run tests
 
@@ -59,40 +123,57 @@ $ pnpm run test:cov
 
 ## Deployment
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+When you're ready to deploy your NestJS application to production:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+1. Set all environment variables in your hosting platform
+2. Run database migrations: `pnpm prisma migrate deploy`
+3. Build the application: `pnpm run build`
+4. Start the production server: `pnpm run start:prod`
+
+For more deployment options, check out the [NestJS deployment documentation](https://docs.nestjs.com/deployment).
+
+## Database Management
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# Generate Prisma Client after schema changes
+$ pnpm prisma generate
+
+# Create a new migration
+$ pnpm prisma migrate dev --name migration_name
+
+# Apply migrations in production
+$ pnpm prisma migrate deploy
+
+# Open Prisma Studio (database GUI)
+$ pnpm prisma studio
+
+# Reset database (development only)
+$ pnpm prisma migrate reset
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Project Structure
+
+```
+src/
+├── auth/           # Authentication & authorization
+├── users/          # User management
+├── courses/        # Course management
+├── quizzes/        # AI-powered quiz generation
+├── database/       # Prisma service & database module
+└── main.ts         # Application entry point
+
+prisma/
+├── schema.prisma   # Database schema
+├── migrations/     # Database migrations
+└── seed.ts         # Database seeding script
+```
 
 ## Resources
 
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- [NestJS Documentation](https://docs.nestjs.com)
+- [Prisma Documentation](https://www.prisma.io/docs)
+- [Mistral AI Documentation](https://docs.mistral.ai)
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is [MIT licensed](LICENSE).
