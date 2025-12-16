@@ -17,8 +17,7 @@ export class AuthService {
     });
 
     if (user) {
-      //const isPasswordValid = await bcrypt.compare(password, user.password); // Simplified for example purposes
-      const isPasswordValid = password === user.password; // Simplified for example purposes
+      const isPasswordValid = await bcrypt.compare(password, user.password);
       if (isPasswordValid) {
         // Generate JWT token
         const payload = { sub: user.id, email: user.email };
