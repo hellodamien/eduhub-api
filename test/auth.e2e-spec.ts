@@ -22,6 +22,7 @@ describe('Auth E2E', () => {
       email: 'jean@example.com',
       password: 'password',
     };
+
     return request(app.getHttpServer())
       .post('/auth/login')
       .send(signInDto)
