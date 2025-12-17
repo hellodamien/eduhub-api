@@ -53,7 +53,7 @@ jobs:
         id: trigger
         run: |
           RESPONSE=$(curl -s -X GET "$COOLIFY_API_URL/api/v1/deploy?uuid=$APPLICATION_ID" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}")
+            -H "Authorization: Bearer $COOLIFY_API_KEY")
           echo "response=$RESPONSE" >> $GITHUB_OUTPUT
           echo "Deployment triggered"
           echo "$RESPONSE"
