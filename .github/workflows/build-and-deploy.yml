@@ -48,3 +48,54 @@ jobs:
             -H "Authorization: Bearer $COOLIFY_API_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"docker_registry_image_tag\":\"$IMAGE_TAG\"}"
+
+      - name: Trigger deployment
+        id: trigger
+        run: |
+          RESPONSE=$(curl -s -X GET "$COOLIFY_API_URL/api/v1/deploy?uuid=$APPLICATION_ID" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}")
+          echo "response=$RESPONSE" >> $GITHUB_OUTPUT
+          echo "Deployment triggered"
+          echo "$RESPONSE"
+
+      - name: Monitor deployment status
+        env:
+          COOLIFY_API_URL: ${{ secrets.COOLIFY_API }}
+          COOLIFY_API_KEY: ${{ secrets.COOLIFY_TOKEN }}
+          APPLICATION_ID: qgc0g8s0gc4og00kwwk00s4w
+        run: |
+          DEPLOYMENT_UUID=$(echo '${{ steps.trigger.outputs.response }}' | jq -r '.deployment_uuid // .uuid // empty')
+          
+          if [ -z "$DEPLOYMENT_UUID" ]; then
+            echo "No deployment UUID found in response"
+            exit 1
+          fi
+          
+          echo "Monitoring deployment: $DEPLOYMENT_UUID"
+          
+          MAX_ATTEMPTS=60
+          ATTEMPT=0
+          
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            STATUS_RESPONSE=$(curl -s -X GET "$COOLIFY_API_URL/v1/deployments/$DEPLOYMENT_UUID" \
+              -H "Authorization: Bearer $COOLIFY_API_KEY")
+            
+            STATUS=$(echo "$STATUS_RESPONSE" | jq -r '.status // empty')
+            
+            echo "Attempt $((ATTEMPT+1))/$MAX_ATTEMPTS - Status: $STATUS"
+            
+            if [ "$STATUS" = "success" ] || [ "$STATUS" = "finished" ]; then
+              echo "Deployment completed successfully!"
+              exit 0
+            elif [ "$STATUS" = "failed" ] || [ "$STATUS" = "error" ]; then
+              echo "Deployment failed!"
+              echo "$STATUS_RESPONSE"
+              exit 1
+            fi
+            
+            ATTEMPT=$((ATTEMPT+1))
+            sleep 10
+          done
+          
+          echo "Deployment monitoring timed out"
+          exit 1
