@@ -36,13 +36,14 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
+    env:
+      COOLIFY_API_URL: ${{ secrets.COOLIFY_API }}
+      COOLIFY_API_KEY: ${{ secrets.COOLIFY_TOKEN }}
+      IMAGE_TAG: ${{ github.sha }}
+      APPLICATION_ID: qgc0g8s0gc4og00kwwk00s4w
+
     steps:
       - name: Update Coolify resource
-        env:
-          COOLIFY_API_URL: ${{ secrets.COOLIFY_API }}
-          COOLIFY_API_KEY: ${{ secrets.COOLIFY_TOKEN }}
-          IMAGE_TAG: ${{ github.sha }}
-          APPLICATION_ID: qgc0g8s0gc4og00kwwk00s4w
         run: |
           curl -X PATCH "$COOLIFY_API_URL/v1/applications/$APPLICATION_ID" \
             -H "Authorization: Bearer $COOLIFY_API_KEY" \
@@ -51,23 +52,14 @@ jobs:
 
       - name: Trigger deployment
         id: trigger
-        env:
-          COOLIFY_API_URL: ${{ secrets.COOLIFY_API }}
-          COOLIFY_API_KEY: ${{ secrets.COOLIFY_TOKEN }}
-          IMAGE_TAG: ${{ github.sha }}
-          APPLICATION_ID: qgc0g8s0gc4og00kwwk00s4w
         run: |
-          RESPONSE=$(curl -s -X GET "$COOLIFY_API_URL/api/v1/deploy?uuid=$APPLICATION_ID" \
+          RESPONSE=$(curl -s -X GET "$COOLIFY_API_URL/v1/deploy?uuid=$APPLICATION_ID" \
             -H "Authorization: Bearer $COOLIFY_API_KEY")
           echo "response=$RESPONSE" >> $GITHUB_OUTPUT
           echo "Deployment triggered"
           echo "$RESPONSE"
 
       - name: Monitor deployment status
-        env:
-          COOLIFY_API_URL: ${{ secrets.COOLIFY_API }}
-          COOLIFY_API_KEY: ${{ secrets.COOLIFY_TOKEN }}
-          APPLICATION_ID: qgc0g8s0gc4og00kwwk00s4w
         run: |
           DEPLOYMENT_UUID=$(echo '${{ steps.trigger.outputs.response }}' | jq -r '.deployment_uuid // .uuid // empty')
           
