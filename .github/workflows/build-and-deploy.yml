@@ -1,10 +1,6 @@
 name: build-and-deploy
 
-on:
-  workflow_run:
-    workflows: ["tests"]
-    types:
-      - completed
+on: workflow_dispatch
 
 jobs:
   build:
