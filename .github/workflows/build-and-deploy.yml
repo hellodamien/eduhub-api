@@ -44,7 +44,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
           APPLICATION_ID: qgc0g8s0gc4og00kwwk00s4w
         run: |
-          curl -X PATCH "$COOLIFY_API_URL/applications/$APPLICATION_ID" \
+          curl -X PATCH "$COOLIFY_API_URL/v1/applications/$APPLICATION_ID" \
             -H "Authorization: Bearer $COOLIFY_API_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"docker_registry_image_tag\":\"$IMAGE_TAG\"}"
