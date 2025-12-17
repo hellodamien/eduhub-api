@@ -44,6 +44,9 @@ COPY --from=builder /app/dist ./dist
 # Copy Prisma client
 COPY --from=builder /app/generated ./generated
 
+# Copy Prisma schema and migrations
+COPY prisma ./prisma
+
 # Expose the application port
 EXPOSE 3000
 
