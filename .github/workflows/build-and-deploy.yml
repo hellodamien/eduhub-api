@@ -50,6 +50,7 @@ jobs:
             -d "{\"docker_registry_image_tag\":\"$IMAGE_TAG\"}"
 
       - name: Trigger deployment
+        id: trigger
         env:
           COOLIFY_API_URL: ${{ secrets.COOLIFY_API }}
           COOLIFY_API_KEY: ${{ secrets.COOLIFY_TOKEN }}
