@@ -50,7 +50,11 @@ jobs:
             -d "{\"docker_registry_image_tag\":\"$IMAGE_TAG\"}"
 
       - name: Trigger deployment
-        id: trigger
+        env:
+          COOLIFY_API_URL: ${{ secrets.COOLIFY_API }}
+          COOLIFY_API_KEY: ${{ secrets.COOLIFY_TOKEN }}
+          IMAGE_TAG: ${{ github.sha }}
+          APPLICATION_ID: qgc0g8s0gc4og00kwwk00s4w
         run: |
           RESPONSE=$(curl -s -X GET "$COOLIFY_API_URL/api/v1/deploy?uuid=$APPLICATION_ID" \
             -H "Authorization: Bearer $COOLIFY_API_KEY")
