@@ -1,6 +1,9 @@
 # Build stage
 FROM node:22-alpine AS builder
 
+# Add env for Prisma client generation
+ENV DATABASE_URL="postgresql://a:a@localhost:5432/a?schema=public&connection_limit=5"
+
 # Install pnpm
 RUN npm install -g pnpm
 
