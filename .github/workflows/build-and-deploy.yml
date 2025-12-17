@@ -31,3 +31,20 @@ jobs:
       - name: Push Docker image
         run: |
           docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Update Coolify resource
+        env:
+          COOLIFY_API_URL: ${{ secrets.COOLIFY_API_URL }}
+          COOLIFY_API_KEY: ${{ secrets.COOLIFY_API_KEY }}
+          IMAGE_TAG: ${{ github.sha }}
+          RESOURCE_ID: qgc0g8s0gc4og00kwwk00s4w
+        run: |
+          curl -X PATCH "$COOLIFY_API_URL/resources/$RESOURCE_ID" \
+            -H "Authorization: Bearer $COOLIFY_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "{\"image\":\"ghcr.io/${{ github.repository }}:$IMAGE_TAG\"}"
