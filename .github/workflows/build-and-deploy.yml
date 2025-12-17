@@ -61,7 +61,7 @@ jobs:
 
       - name: Monitor deployment status
         run: |
-          DEPLOYMENT_UUID=$(echo '${{ steps.trigger.outputs.response }}' | jq -r '.deployment_uuid // .uuid // empty')
+          DEPLOYMENT_UUID=$(echo '${{ steps.trigger.outputs.response }}' | jq -r '.deployments[0].deployment_uuid')
           
           if [ -z "$DEPLOYMENT_UUID" ]; then
             echo "No deployment UUID found in response"
