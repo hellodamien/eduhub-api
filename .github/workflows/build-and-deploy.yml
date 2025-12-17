@@ -39,8 +39,8 @@ jobs:
     steps:
       - name: Update Coolify resource
         env:
-          COOLIFY_API_URL: ${{ secrets.COOLIFY_API_URL }}
-          COOLIFY_API_KEY: ${{ secrets.COOLIFY_API_KEY }}
+          COOLIFY_API_URL: ${{ secrets.COOLIFY_API }}
+          COOLIFY_API_KEY: ${{ secrets.COOLIFY_TOKEN }}
           IMAGE_TAG: ${{ github.sha }}
           RESOURCE_ID: qgc0g8s0gc4og00kwwk00s4w
         run: |
