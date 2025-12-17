@@ -41,6 +41,9 @@ RUN pnpm install --prod --frozen-lockfile
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy Prisma client
+COPY --from=builder /app/generated ./generated
+
 # Expose the application port
 EXPOSE 3000
 
